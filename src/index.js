@@ -25,7 +25,7 @@ async function searchPhotos(evt) {
   const response = await apiServ.fetchCards();
   renderCards(response);
   console.log(response.data.totalHits);
-  const totalHits = response.data.totalHits;
+  totalHits = response.data.totalHits;
   if (response.data.hits.length === 0) return;
   Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
   if (totalHits <= 40) {
