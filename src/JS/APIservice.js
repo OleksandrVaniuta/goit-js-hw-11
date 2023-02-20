@@ -14,7 +14,7 @@ export default class apiServive {
         orientation: 'horizontal',
         safesearch: 'true',
         page: this.page,
-        per_page: '40',
+        per_page: 40,
         key: '33763278-a8135cc0e5b2d03eb2d8094e4',
       },
     };
