@@ -18,14 +18,14 @@ const gellery = new SimpleLightbox('.photo-card a');
 async function searchPhotos(evt) {
   evt.preventDefault();
   galleryEl.innerHTML = '';
-
+  loadMoreBtn.classList.add('opacity');
   apiServ.setTag = evt.currentTarget.elements.searchQuery.value;
   apiServ.resetPage();
 
   const response = await apiServ.fetchCards();
   renderCards(response);
   totalHits = response.data.totalHits;
-  if (response.data) return;
+  if (response.data.hits.length === 0) return;
   Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
   if (totalHits <= 40) {
     return;
