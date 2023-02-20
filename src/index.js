@@ -9,6 +9,8 @@ const formEL = document.querySelector('.search-form');
 const galleryEl = document.querySelector('.gallery');
 const loadMoreBtn = document.querySelector('.load-more');
 let totalHits = 0;
+let counerCards = 40;
+
 formEL.addEventListener('submit', searchPhotos);
 loadMoreBtn.addEventListener('click', onLoadMore);
 
@@ -72,15 +74,17 @@ function renderCards(cardObj) {
 }
 
 async function onLoadMore() {
-  if (this.page * 40 >= totalHits) {
+  const response = await apiServ.fetchCards();
+  renderCards(response);
+  counerCards += response.data.hits.length;
+  console.log(counerCards);
+  if (counerCards === totalHits) {
     loadMoreBtn.classList.add('opacity');
     Notiflix.Notify.info(
       `We're sorry, but you've reached the end of search results.`
     );
     return;
   }
-  const response = await apiServ.fetchCards();
-  renderCards(response);
 }
 
 function activeLightBox() {
