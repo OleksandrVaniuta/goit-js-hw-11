@@ -48,13 +48,24 @@ body {
   display: flex;
   flex-wrap: wrap;
 }
+.photo-card {
+  border: 2px solid;
+  margin-bottom: 5px;
+}
 .cardImg {
   width: 280px;
   height: 180px;
+  display: block;
 }
 .info {
   display: flex;
   font-size: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  justify-content: space-between;
+}
+.info-item {
+  margin: 0 auto;
 }
 .load-more {
   margin: 0 auto;
@@ -63,4 +74,11 @@ body {
 
 .opacity {
   display: none;
+}
+.gallery__item {
+  text-decoration: none;
+  color: black;
+}
+b {
+  display: block;
 }

@@ -1,86 +1,93 @@
-// import apiServive from './JS/APIservice';
+import apiServive from './JS/APIservice';
 import Notiflix from 'notiflix';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
+
 Notiflix.Notify.init({ position: 'right-top' });
 
 const formEL = document.querySelector('.search-form');
 const galleryEl = document.querySelector('.gallery');
 const loadMoreBtn = document.querySelector('.load-more');
 
-let page = 1;
-let tag = '';
-let totalHits = 0;
-
 formEL.addEventListener('submit', searchPhotos);
 loadMoreBtn.addEventListener('click', onLoadMore);
 
-// const apiServive = new apiServive();
-function searchPhotos(evt) {
+const apiServ = new apiServive();
+const gellery = new SimpleLightbox('.photo-card a');
+
+async function searchPhotos(evt) {
   evt.preventDefault();
   galleryEl.innerHTML = '';
-  loadMoreBtn.classList.add('opacity');
-  //   apiServive.tag = evt.currentTarget.elements.searchQuery.value;
-  //   console.log(apiServive.tag);
-  //   //   apiServive.resetPage();
-  //   apiServive.fetchCards().then(data => renderCards(data));
-  page = 1;
-  console.log(evt.currentTarget.elements.searchQuery.value);
-  tag = evt.currentTarget.elements.searchQuery.value;
-  fetchPhotos(tag).then(photos => {
-    renderCards(photos);
-    totalHits = photos.totalHits;
-    Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
-    if (totalHits <= 40) {
-      return;
-    }
-    loadMoreBtn.classList.remove('opacity');
-  });
-}
 
-async function fetchPhotos(tag) {
-  const response = await fetch(
-    `https://pixabay.com/api/?key=33763278-a8135cc0e5b2d03eb2d8094e4&q=${tag}&image_type=photo&orientation=horizontal&safesearch=true&page=${page}&per_page=40`
-  );
-  const photos = await response.json();
-  page += 1;
-  return photos;
+  apiServ.setTag = evt.currentTarget.elements.searchQuery.value;
+  apiServ.resetPage();
+
+  const response = await apiServ.fetchCards();
+  renderCards(response);
+  totalHits = response.data.totalHits;
+  if (response.data) return;
+  Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
+  if (totalHits <= 40) {
+    return;
+  }
+  loadMoreBtn.classList.remove('opacity');
 }
 
 function renderCards(cardObj) {
-  if (cardObj.hits.length === 0) {
+  if (cardObj.data.hits.length === 0) {
     Notiflix.Notify.failure(
       'Sorry, there are no images matching your search query. Please try again.'
     );
     return;
   }
-  const markup = cardObj.hits.map(card => {
+  const markup = cardObj.data.hits.map(card => {
     return `<div class="photo-card">
+          <a class="gallery__item" href="${card.largeImageURL}">
           <img src="${card.webformatURL}" alt="${card.tags}" loading="lazy" class="cardImg" />
           <div class="info">
             <p class="info-item">
-              <b>${card.likes} Likes</b>
+              <b class='count'>${card.likes}</b>
+              <b>Likes</b>
             </p>
             <p class="info-item">
-              <b>${card.views} Views</b>
+             <b class='count'>${card.views}</b>
+              <b>Views</b>
             </p>
             <p class="info-item">
-              <b>${card.comments} Comments</b>
+             <b class='count'>${card.comments}</b>
+              <b>Comments</b>
             </p>
             <p class="info-item">
-              <b>${card.downloads} Downloads</b>
+             <b class='count'>${card.downloads}</b>
+              <b>Downloads</b>
             </p>
           </div>
+           </a>
         </div>`;
   });
-  console.log(cardObj.totalHits);
+
   galleryEl.insertAdjacentHTML('beforeend', [...markup]);
+  activeLightBox();
 }
 
-function onLoadMore() {
-  fetchPhotos(tag).then(photos => renderCards(photos));
-  if (page * 40 >= totalHits) {
+async function onLoadMore() {
+  const response = await apiServ.fetchCards();
+  renderCards(response);
+
+  if (this.page * 40 >= totalHits) {
     loadMoreBtn.classList.add('opacity');
     Notiflix.Notify.info(
       `We're sorry, but you've reached the end of search results.`
     );
   }
+}
+
+function activeLightBox() {
+  const galleryLink = document.querySelectorAll('.gallery__item');
+  galleryLink.forEach(link => {
+    link.addEventListener('click', event => {
+      event.preventDefault();
+    });
+  });
+  gellery.refresh();
 }
