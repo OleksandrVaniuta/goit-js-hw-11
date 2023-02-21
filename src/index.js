@@ -8,6 +8,7 @@ Notiflix.Notify.init({ position: 'right-top' });
 const formEL = document.querySelector('.search-form');
 const galleryEl = document.querySelector('.gallery');
 const loadMoreBtn = document.querySelector('.load-more');
+
 let totalHits = 0;
 let counerCards = 40;
 
@@ -26,13 +27,17 @@ async function searchPhotos(evt) {
 
   const response = await apiServ.fetchCards();
   renderCards(response);
-  console.log(response.data.totalHits);
+
   totalHits = response.data.totalHits;
+
   if (response.data.hits.length === 0) return;
+
   Notiflix.Notify.info(`Hooray! We found ${totalHits} images.`);
+
   if (totalHits <= 40) {
     return;
   }
+
   loadMoreBtn.classList.remove('opacity');
 }
 
@@ -43,6 +48,7 @@ function renderCards(cardObj) {
     );
     return;
   }
+
   const markup = cardObj.data.hits.map(card => {
     return `<div class="photo-card">
           <a class="gallery__item" href="${card.largeImageURL}">
@@ -68,8 +74,8 @@ function renderCards(cardObj) {
            </a>
         </div>`;
   });
-
   galleryEl.insertAdjacentHTML('beforeend', [...markup]);
+
   activeLightBox();
 }
 
@@ -77,11 +83,11 @@ async function onLoadMore() {
   const response = await apiServ.fetchCards();
   renderCards(response);
   counerCards += response.data.hits.length;
-  console.log(counerCards);
+
   if (counerCards === totalHits) {
     loadMoreBtn.classList.add('opacity');
     Notiflix.Notify.info(
-      `We're sorry, but you've reached the end of search results.`
+      "We're sorry, but you've reached the end of search results."
     );
     return;
   }
